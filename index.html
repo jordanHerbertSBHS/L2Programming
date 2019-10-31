@@ -20,57 +20,63 @@
             setInterval(mainloop, 1000 / 50);
         }
 
-        // player variables
-        var playerXpos = 0;
-        var playerYpos = 0;
-        var playerSize = 20;
-        var playerYspeed = 5;
-        
-        // enemy variables
-        
 
-
+        //Movement with W,S UP and Down arrow keys
         const UP_KEY = 38;
+        const W_KEY = 87;
         const DOWN_KEY = 40;
-        var leftKeyPressed = false;
+        const S_KEY = 83;
+        
         var upKeyPressed = false;
-        var rightKeyPressed = false;
+        var WKeyPressed = false;
         var downKeyPressed = false;
-
+        var SKeyPressed = false;
+        
         // player image
         var player = new Image();
         player.src = 'images/player.png';
         
-        // enemy image
-        
         // player spriteSheet variables
-
         var playerXpos = 10;
         var playerYpos = 200;
-        var playerSize = 20;
-        var playerYspeed = 3;
+        var playerSize = 50;
+        var playerYspeed = 5;
 
 
         var playerSpritesheetXY = [];
         var playerRowCount = 0;
         var playerSpriteSheetTotal = 16;
 
+        var score = 0;
+        // enemy image
+        var enemy = new Image();
+        enemy.src = 'images/Asteroid Brown.png';
+        
+        // enemy variables
+        var enemyXpos = 700;
+        var enemyYpos = 200;
+        var ENEMY_SIZE = 20;
+        var enemyYspeed = 0;
+        var enemyXspeed = -8;
+        
         for (var i = 0; i < playerSpriteSheetTotal; i++) {
             playerSpritesheetXY[i] = new Array(2);
 
         }
-
+        // Background image
         var bg = new Image();
         bg.src = 'images/GM1.jpg';
 
 
         function mainloop() {
-
-            drawImg(bg, 0, 0, canvas.width, canvas.height);
-            drawImg(player, playerXpos, playerYpos, 60, 50);
+ 
+            drawImg(bg, 0, 0, canvas.width, canvas.height); //Background
+            drawImg(player, playerXpos, playerYpos, playerSize, playerSize); //Player
+            drawImg(enemy, enemyXpos, enemyYpos, 60, 60) //Enemy
+            drawText('Score:' + score, 50, 50 ,'20px Arial','white');
             
-
             playerMove()
+            enemyMove()
         }
 
 
@@ -80,6 +86,12 @@
                 upKeyPressed = true;
             }
             if (evt.keyCode == DOWN_KEY) {
+                downKeyPressed = true;
+            }
+            if (evt.keyCode == W_KEY) {
+                upKeyPressed = true;
+            }
+            if (evt.keyCode == S_KEY) {
                 downKeyPressed = true;
             }
         }
@@ -92,26 +104,55 @@
             if (evt.keyCode == DOWN_KEY) {
                 downKeyPressed = false;
             }
+            if (evt.keyCode == W_KEY) {
+                upKeyPressed = false;
+            }
+            if (evt.keyCode == S_KEY) {
+                downKeyPressed = false;
+            }
         }
 
         function playerMove() {
-            if (upKeyPressed) {
+            if (upKeyPressed && playerYpos > 0) {
                 playerYpos -= playerYspeed
             }
 
-            if (downKeyPressed) {
+            if (downKeyPressed && playerYpos + playerSize < canvas.height) {
                 playerYpos += playerYspeed
+            }
+        }
+        
+        function enemyMove(){
+            enemyXpos += enemyXspeed;
+            enemyYpos += enemyYspeed;
+            
+            if(enemyXpos + ENEMY_SIZE < 0){
+            enemyYpos = Math.floor(Math.random()*(canvas.height - ENEMY_SIZE));
+            enemyXpos = canvas.width;
+            enemyXspeed = Math.floor(Math.random()*(10 - 4) + 4) * -1;
+            }
+            
+            if(enemyXpos + ENEMY_SIZE > playerXpos && enemyXpos < playerXpos + playerSize && enemyYpos + ENEMY_SIZE > playerYpos && enemyYpos < playerYpos + playerSize){
+               playerYpos = 0; 
             }
         }
 
         function colorRect(x, y, w, h, c) {
             canvasContext.fillStyle = c;
             canvasContext.fillRect(x, y, w, h);
+            drawText('Game over your score was ' +
+            score,0,canvas.height / 2, '30px Arial','white');
         }
 
         function drawImg(img, x, y, w, h) {
             canvasContext.drawImage(img, x, y, w, h);
         }
-
+        
+        function drawText(msg,x,y,f,c){
+            canvasContext.fillStyle = c;
+            canvasContext.font = f; //"20px Arial"`
+            canvasContext.fillText(msg,x,y)
+        }
+        
     </script>
 </body>
